@@ -5,10 +5,14 @@ export default function Convert() {
   const [text, setText] = useState('');
   const [voice, setVoice] = useState('Brian');
   const [audioUrl, setAudioUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleConvert = async () => {
+    if (!text.trim()) return;
+    setLoading(true);
     const url = await convertTextToSpeech(text, voice);
     setAudioUrl(url);
+    setLoading(false);
   };
 
   const handleDownload = () => {
@@ -19,48 +23,57 @@ export default function Convert() {
   };
 
   return (
-    <div className="p-6 space-y-4 max-w-xl mx-auto">
-      <textarea
-        className="w-full p-3 border rounded"
-        rows="4"
-        placeholder="Enter text here"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      ></textarea>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+      <div className="max-w-3xl mx-auto px-4 py-12 text-gray-900 dark:text-gray-100">
+        <h2 className="text-3xl font-bold mb-6 text-center">Text to Speech Converter</h2>
 
-      <select
-        className="w-full p-3 border rounded"
-        value={voice}
-        onChange={(e) => setVoice(e.target.value)}
-      >
-        <option value="Brian">Brian (UK Male)</option>
-        <option value="Emma">Emma (UK Female)</option>
-        <option value="Ivy">Ivy (US Female)</option>
-        <option value="Justin">Justin (US Male)</option>
-        <option value="Kendra">Kendra (US Female)</option>
-        <option value="Kimberly">Kimberly (US Female)</option>
-        <option value="Joey">Joey (US Male)</option>
-        <option value="Salli">Salli (US Female)</option>
-      </select>
+        <div className="space-y-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg transition-all">
+          <textarea
+            className="w-full p-4 border dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            rows="5"
+            placeholder="Type or paste text here..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
 
-      <button
-        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded"
-        onClick={handleConvert}
-      >
-        Convert to Speech
-      </button>
-
-      {audioUrl && (
-        <div className="mt-4 space-y-2">
-          <audio controls src={audioUrl} className="w-full" />
-          <button
-            onClick={handleDownload}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+          <select
+            className="w-full p-3 border dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-900 focus:outline-none"
+            value={voice}
+            onChange={(e) => setVoice(e.target.value)}
           >
-            Download MP3
+            <option value="Brian">Brian (UK Male)</option>
+            <option value="Emma">Emma (UK Female)</option>
+            <option value="Ivy">Ivy (US Female)</option>
+            <option value="Justin">Justin (US Male)</option>
+            <option value="Kendra">Kendra (US Female)</option>
+            <option value="Kimberly">Kimberly (US Female)</option>
+            <option value="Joey">Joey (US Male)</option>
+            <option value="Salli">Salli (US Female)</option>
+          </select>
+
+          <button
+            className={`w-full bg-gradient-to-r from-green-600 to-emerald-500 hover:opacity-90 text-white font-medium py-3 rounded-md transition duration-300 ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            onClick={handleConvert}
+            disabled={loading}
+          >
+            {loading ? 'Converting...' : 'Convert to Speech'}
           </button>
+
+          {audioUrl && (
+            <div className="mt-6 space-y-4 text-center animate-fade-in">
+              <audio controls src={audioUrl} className="w-full" />
+              <button
+                onClick={handleDownload}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition"
+              >
+                Download MP3
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
